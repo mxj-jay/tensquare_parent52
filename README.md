@@ -1,1 +1,1 @@
-![image](https://github.com/mxj-jay/images/timg.jpg)
+![image](https://github.com/mxj-jay/hello-world/blob/master/images/timg.jpg)
