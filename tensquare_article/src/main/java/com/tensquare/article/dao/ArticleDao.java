@@ -20,7 +20,7 @@ public interface ArticleDao extends JpaRepository<Article, String>, JpaSpecifica
      */
     @Modifying
     @Query(value = "update tb_article set state = 1 WHERE id = ?", nativeQuery = true)
-    public void updateState(String id);
+    void updateState(String id);
 
     /**
      * 文章模块
@@ -28,5 +28,5 @@ public interface ArticleDao extends JpaRepository<Article, String>, JpaSpecifica
      */
     @Modifying
     @Query(value = "update tb_article set thumbup=thumbup+1 WHERE id = ?", nativeQuery = true)
-    public void addThumbup(String id);
+    void addThumbup(String id);
 }

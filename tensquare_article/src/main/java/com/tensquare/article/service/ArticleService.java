@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import util.IdWorker;
 
 import com.tensquare.article.dao.ArticleDao;
@@ -27,9 +28,16 @@ import com.tensquare.article.pojo.Article;
 /**
  * 服务层
  *
+ * @author 59742
  * @author Administrator
+ * @date 2019/10/14
+ */
+
+/**
+ * 执行sql，需要事务 -- 否则出现Executing an update/delete query此类错误
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ArticleService {
 
     @Autowired
@@ -38,8 +46,17 @@ public class ArticleService {
     @Autowired
     private IdWorker idWorker;
 
-    public void updateState (String id){
+    /**
+     * 文章模块
+     *
+     * @param id 升级id
+     */
+    public void updateState(String id) {
+        articleDao.updateState(id);
+    }
 
+    public void addThumbup(String id) {
+        articleDao.addThumbup(id);
     }
 
     /**
