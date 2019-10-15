@@ -82,7 +82,7 @@ public class GatheringService {
      * @param id
      * @return
      */
-    @Cacheable(value = "gathering", key = "#id")	// value指定全局的识别名称,即先找gathering再找id
+    @Cacheable(value = "gathering", key = "#id")    // value指定全局的识别名称,即先找gathering再找id
     public Gathering findById(String id) {
         return gatheringDao.findById(id).get();
     }
@@ -112,7 +112,7 @@ public class GatheringService {
      *
      * @param id
      */
-	@CacheEvict(value = "gathering", key = "#id")
+    @CacheEvict(value = "gathering", key = "#id")
     public void deleteById(String id) {
         gatheringDao.deleteById(id);
     }
