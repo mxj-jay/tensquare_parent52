@@ -9,11 +9,12 @@ import java.util.Map;
 @Component
 @RabbitListener(queues = "sms")
 public class SmsListener {
-
     @RabbitHandler
     public void executeSms(Map<String, String> map) {
-        System.out.println("手机号:" + map.get("mobile"));
-        System.out.println("验证码:" + map.get("randomNumeric"));
+        String moblie = map.get("mobile");
+        String randomNumeric = map.get("randomNumeric");
+        System.out.println("手机号:" + moblie);
+        System.out.println("验证码:" + randomNumeric);
     }
 
 }
