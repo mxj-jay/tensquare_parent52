@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -148,28 +149,35 @@ public class UserService {
      * @param id
      */
     public void deleteById(String id) {
-        String authorization = httpServerRequestHeader.getHeader("Authorization");
-        // 判断请求头中的token
-        if (authorization == null || "".equals(authorization)) {
-            throw new RuntimeException("权限不足");
-        }
-        if (!authorization.startsWith("Bearer ")) {
-            throw new RuntimeException("权限不足");
-        }
-        // 获取token
-        String token = authorization.substring(7);
-        System.out.println(1);
+        /** 重复代码
+         String authorization = httpServerRequestHeader.getHeader("Authorization");
+         // 判断请求头中的token
+         if (authorization == null || "".equals(authorization)) {
+         throw new RuntimeException("权限不足");
+         }
+         if (!authorization.startsWith("Bearer ")) {
+         throw new RuntimeException("权限不足");
+         }
+         // 获取token
+         String token = authorization.substring(7);
+         // System.out.println(1);
+         // System.out.println(token);
+         try {
+         // System.out.println(2);
+         Claims claims = jwtUtil.parseJWT(token);
+         // System.out.println(3);
+         String roles = (String) claims.get("roles");
+         // System.out.println(roles);
+         if (roles == null && !roles.equals("admin")) {
+         throw new RuntimeException("权限不足");
+         }
+         } catch (Exception e) {
+         throw new RuntimeException("权限不足");
+         }
+         */
+        String token = (String) httpServerRequestHeader.getAttribute("claims_admin");
         System.out.println(token);
-        try {
-            System.out.println(2);
-            Claims claims = jwtUtil.parseJWT(token);
-            System.out.println(3);
-            String roles = (String) claims.get("roles");
-//            System.out.println(roles);
-            if (roles == null && !roles.equals("admin")) {
-                throw new RuntimeException("权限不足");
-            }
-        } catch (Exception e) {
+        if (token == null || "".equals(token)) {
             throw new RuntimeException("权限不足");
         }
         userDao.deleteById(id);

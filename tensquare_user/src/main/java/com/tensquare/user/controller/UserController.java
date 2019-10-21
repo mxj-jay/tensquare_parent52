@@ -1,5 +1,6 @@
 package com.tensquare.user.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,11 @@ public class UserController {
         if (user == null) {
             return new Result(false, StatusCode.LOGINERROR, "登陆失败");
         }
-        return new Result(true, StatusCode.OK, "登陆成功");
+        String token = jwtUtil.createJWT(user.getId(), user.getMobile(), "user");
+        Map<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        map.put("roles", "user");
+        return new Result(true, StatusCode.OK, "登陆成功", map);
     }
 
     /**
