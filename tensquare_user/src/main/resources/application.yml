@@ -15,3 +15,8 @@ spring:
     host: 192.168.187.135
   rabbitmq:
     host: 192.168.187.135
+
+jwt:
+  config:
+    key: internet
+    ttl: 1800000

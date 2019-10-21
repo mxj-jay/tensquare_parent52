@@ -2,7 +2,10 @@ package com.tensquare.user;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import util.IdWorker;
+import util.JwtUtil;
+
 @SpringBootApplication
 public class UserApplication {
 
@@ -13,6 +16,18 @@ public class UserApplication {
 	@Bean
 	public IdWorker idWorkker(){
 		return new IdWorker(1, 1);
+	}
+
+	// spring-security
+	@Bean
+	public BCryptPasswordEncoder bCryptPasswordEncoder(){
+		return new BCryptPasswordEncoder();
+	}
+
+	// jwt
+	@Bean
+	public JwtUtil jwtUtil(){
+		return new JwtUtil();
 	}
 	
 }

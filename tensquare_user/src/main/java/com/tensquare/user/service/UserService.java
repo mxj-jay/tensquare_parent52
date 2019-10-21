@@ -9,7 +9,11 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
+import javax.servlet.http.HttpServletRequest;
 
+import entity.Result;
+import entity.StatusCode;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +22,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import reactor.ipc.netty.http.server.HttpServerRequest;
 import util.IdWorker;
 
 import com.tensquare.user.dao.UserDao;
 import com.tensquare.user.pojo.User;
+import util.JwtUtil;
 
 /**
  * 服务层
@@ -44,6 +51,16 @@ public class UserService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private HttpServletRequest httpServerRequestHeader;  // 将token信息放到header中,安全
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    // 密码加密
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 查询全部列表
@@ -98,6 +115,9 @@ public class UserService {
      */
     public void add(User user) {
         user.setId(idWorker.nextId() + "");
+        // 密码加密
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
         //关注数
         user.setFollowcount(0);
         //粉丝数
@@ -123,11 +143,35 @@ public class UserService {
     }
 
     /**
-     * 删除
+     * 删除   必须有admin角色才可以删除
      *
      * @param id
      */
     public void deleteById(String id) {
+        String authorization = httpServerRequestHeader.getHeader("Authorization");
+        // 判断请求头中的token
+        if (authorization == null || "".equals(authorization)) {
+            throw new RuntimeException("权限不足");
+        }
+        if (!authorization.startsWith("Bearer ")) {
+            throw new RuntimeException("权限不足");
+        }
+        // 获取token
+        String token = authorization.substring(7);
+        System.out.println(1);
+        System.out.println(token);
+        try {
+            System.out.println(2);
+            Claims claims = jwtUtil.parseJWT(token);
+            System.out.println(3);
+            String roles = (String) claims.get("roles");
+//            System.out.println(roles);
+            if (roles == null && !roles.equals("admin")) {
+                throw new RuntimeException("权限不足");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("权限不足");
+        }
         userDao.deleteById(id);
     }
 
@@ -195,10 +239,18 @@ public class UserService {
         redisTemplate.opsForValue().set("randomNumeric_" + mobile, randomNumeric, 2, TimeUnit.HOURS);
         // 向用户发一份
         Map<String, String> map = new HashMap<>();
-        map.put("mobile",mobile);
-        map.put("randomNumeric",randomNumeric);
-        rabbitTemplate.convertAndSend("sms", map);
+        map.put("mobile", mobile);
+        map.put("randomNumeric", randomNumeric);
+        // rabbitTemplate.convertAndSend("sms", map);
         // 控制台显示一份[方便测试]
         System.out.println("验证码:" + randomNumeric);
+    }
+
+    public User login(String mobile, String password) {
+        User userDaoByMobile = userDao.findByMobile(mobile);
+        if (userDaoByMobile != null && bCryptPasswordEncoder.matches(password, userDaoByMobile.getPassword())) {
+            return userDaoByMobile;
+        }
+        return null;
     }
 }
