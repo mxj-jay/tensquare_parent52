@@ -19,6 +19,8 @@ import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 控制器层
  *
@@ -32,23 +34,26 @@ public class ProblemController {
     @Autowired
     private ProblemService problemService;
 
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     @RequestMapping(value = "/newlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
-	public Result newList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
-		Page<Problem> problemPage = problemService.newList(labelid, page, size);
-		return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
-	}
+    public Result newList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
+        Page<Problem> problemPage = problemService.newList(labelid, page, size);
+        return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
+    }
 
-	@RequestMapping(value = "/hotlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
-	public Result hotList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
-		Page<Problem> problemPage = problemService.hotList(labelid, page, size);
-		return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
-	}
+    @RequestMapping(value = "/hotlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
+    public Result hotList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
+        Page<Problem> problemPage = problemService.hotList(labelid, page, size);
+        return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
+    }
 
-	@RequestMapping(value = "/waitlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
-	public Result waitList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
-		Page<Problem> problemPage = problemService.waitList(labelid, page, size);
-		return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
-	}
+    @RequestMapping(value = "/waitlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
+    public Result waitList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
+        Page<Problem> problemPage = problemService.waitList(labelid, page, size);
+        return new Result(true, StatusCode.OK, "查询成功", new PageResult<Problem>(problemPage.getTotalElements(), problemPage.getContent()));
+    }
 
     /**
      * 查询全部数据
@@ -104,6 +109,10 @@ public class ProblemController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public Result add(@RequestBody Problem problem) {
+        String token = (String) httpServletRequest.getAttribute("claims_user");
+        if (token == null || "".equals(token)){
+            return new Result(true, StatusCode.ACCESSERROR, "权限不足");
+        }
         problemService.add(problem);
         return new Result(true, StatusCode.OK, "增加成功");
     }
