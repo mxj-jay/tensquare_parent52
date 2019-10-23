@@ -1,22 +1,23 @@
 server:
-  port: 9001
-
+  port: 9010
 spring:
   application:
-    name: tensquare-base
+    name: tensquare-friend
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.187.135:3306/tensquare_base?useSSL=false&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.187.135:3306/tensquare_friend?useSSL=false&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
     username: root
     password: 123456
   jpa:
     database: mysql
     show-sql: true
+jwt:
+  config:
+    key: internet
 
 eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:6868/eureka/
-
   instance:
     prefer-ip-address: true

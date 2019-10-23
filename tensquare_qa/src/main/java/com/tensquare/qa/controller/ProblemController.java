@@ -3,6 +3,7 @@ package com.tensquare.qa.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.tensquare.qa.client.BaseClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,6 +37,18 @@ public class ProblemController {
 
     @Autowired
     private HttpServletRequest httpServletRequest;
+
+    @Autowired
+    private BaseClient baseClient;
+
+    /**
+     * 测试Feign
+     */
+    @RequestMapping(value = "/label/{labelID}", method = RequestMethod.GET)
+    private Result findByLabelId(@PathVariable String labelID){
+        Result result = baseClient.findByID(labelID);
+        return result;
+    }
 
     @RequestMapping(value = "/newlist/{labelid}/{page}/{size}", method = RequestMethod.GET)
     public Result newList(@PathVariable String labelid, @PathVariable int page, @PathVariable int size) {
@@ -110,7 +123,7 @@ public class ProblemController {
     @RequestMapping(method = RequestMethod.POST)
     public Result add(@RequestBody Problem problem) {
         String token = (String) httpServletRequest.getAttribute("claims_user");
-        if (token == null || "".equals(token)){
+        if (token == null || "".equals(token)) {
             return new Result(true, StatusCode.ACCESSERROR, "权限不足");
         }
         problemService.add(problem);

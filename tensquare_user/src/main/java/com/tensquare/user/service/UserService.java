@@ -26,6 +26,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import reactor.ipc.netty.http.server.HttpServerRequest;
 import util.IdWorker;
 
@@ -39,6 +40,7 @@ import util.JwtUtil;
  * @author Administrator
  */
 @Service
+@Transactional
 public class UserService {
 
     @Autowired
@@ -260,5 +262,17 @@ public class UserService {
             return userDaoByMobile;
         }
         return null;
+    }
+
+    /**
+     * 更新被关注好友粉丝数跟用户自己的关注数
+     *
+     * @param num
+     * @param userId
+     * @param friendId
+     */
+    public void updateFansAndFollower(int num, String userId, String friendId) {
+        userDao.updateFansNum(num, friendId);
+        userDao.updateFollowNum(num, userId);
     }
 }
