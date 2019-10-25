@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,16 @@ public class LabelController {
     @Autowired
     private LabelService labelService;
 
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {
-        return new Result(true, StatusCode.OK, "查询成功", labelService.findAll());
+        // 获取头信息,经过网关,可能会丢失头信息
+        String authorization = httpServletRequest.getHeader("Authorization");
+        System.out.println("头信息:"+authorization);
+        List<Label> list = labelService.findAll();
+        return new Result(true, StatusCode.OK, "查询成功", list);
     }
 
     @RequestMapping(value = "/{labelID}", method = RequestMethod.GET)
