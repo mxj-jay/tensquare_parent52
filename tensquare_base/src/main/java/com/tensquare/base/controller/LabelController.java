@@ -7,6 +7,8 @@ import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.Map;
 @RestController
 @CrossOrigin     // 跨域问题解决
 @RequestMapping("/label")
+@RefreshScope  // 使用bus同步配置文件时, 使用此注解, 使自定义配置项也可以被识别
 public class LabelController {
 
     @Autowired
@@ -25,8 +28,12 @@ public class LabelController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Value("${ip}")     // 获取配置文件中的自定义配置项
+    private String ip;
+
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {
+        System.out.println("自定义ip内容为:"+ip);
         // 获取头信息,经过网关,可能会丢失头信息
         String authorization = httpServletRequest.getHeader("Authorization");
         System.out.println("头信息:"+authorization);

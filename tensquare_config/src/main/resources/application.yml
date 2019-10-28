@@ -8,9 +8,11 @@ spring:
       server:
         git:
           uri: https://github.com/mxj-jay/tensquare_env_config.git
+  rabbitmq:
+    host: 192.168.187.135
 
 management:   # 暴露触发消息总线的地址
-  endpoint:
+  endpoints:
     web:
       exposure:
         include: bus-refresh
